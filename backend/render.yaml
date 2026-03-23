@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: smartroom-backend
+    runtime: python
+    pythonVersion: 3.11
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn smartroom_backend.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+    routes:
+      - type: http
+        path: /api

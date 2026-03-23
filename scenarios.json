@@ -1,0 +1,47 @@
+[
+  {
+    "nama_perangkat": "Kipas Angin Pintar",
+    "deskripsi_masalah": "Kipas angin pintar di ruangan ini tidak mau menyala. Sistemnya dirancang untuk menyala otomatis ketika suhu ruangan melebihi 25°C. Periksa sensor suhu dan buat logika agar kipas menyala jika suhu > 25°C, dan mati jika suhu <= 25°C.",
+    "logika_penyelesaian": "Baca nilai sensor suhu. Jika suhu > 25°C, nyalakan kipas (set pin digital HIGH). Jika suhu <= 25°C, matikan kipas (set pin digital LOW). Ulangi proses ini secara terus menerus dalam loop.",
+    "kebutuhan_blok": [
+      "blok baca sensor suhu",
+      "blok if-else",
+      "blok komparasi > dan <=",
+      "blok set pin digital HIGH/LOW",
+      "blok loop forever"
+    ]
+  },
+  {
+    "nama_perangkat": "Komputer Otomatis",
+    "deskripsi_masalah": "Komputer di ruangan ini tidak menyala dengan benar. Sistemnya harus menyala ketika ada orang di ruangan (deteksi gerakan) DAN cahaya ruangan rendah (< 50 lux). Jika tidak ada gerakan atau cahaya cukup terang, komputer harus mati. Pastikan logika ini bekerja untuk menghemat energi.",
+    "logika_penyelesaian": "Baca sensor gerakan dan sensor cahaya. Jika ada gerakan (motion detected) DAN cahaya < 50 lux, nyalakan komputer (set pin digital HIGH). Jika tidak, matikan komputer (set pin digital LOW). Gunakan operator logika AND untuk menggabungkan kondisi.",
+    "kebutuhan_blok": [
+      "blok baca sensor gerakan",
+      "blok baca sensor cahaya",
+      "blok if-else",
+      "blok komparasi <",
+      "blok operator logika AND",
+      "blok set pin digital HIGH/LOW",
+      "blok loop forever"
+    ]
+  },
+  {
+    "nama_perangkat": "Lampu Pintar dengan Timer",
+    "deskripsi_masalah": "Lampu pintar di ruangan ini tidak menyala sesuai jadwal. Sistemnya harus menyala otomatis pada pukul 18:00 hingga 06:00, tetapi hanya jika cahaya ruangan rendah (< 30 lux) DAN ada gerakan. Jika kondisi tidak terpenuhi, lampu mati. Tambahkan fitur untuk mematikan lampu secara manual jika diperlukan.",
+    "logika_penyelesaian": "Baca waktu real-time, sensor cahaya, dan sensor gerakan. Jika waktu antara 18:00-06:00 DAN cahaya < 30 lux DAN ada gerakan, nyalakan lampu. Jika tidak, matikan lampu. Gunakan loop untuk memeriksa kondisi setiap detik, dan tambahkan kondisi untuk input manual (misalnya tombol) untuk mematikan lampu kapan saja.",
+    "kebutuhan_blok": [
+      "blok baca waktu real-time",
+      "blok baca sensor cahaya",
+      "blok baca sensor gerakan",
+      "blok if-else",
+      "blok komparasi waktu (antara jam)",
+      "blok komparasi <",
+      "blok operator logika AND",
+      "blok set pin digital HIGH/LOW",
+      "blok loop forever",
+      "blok baca input digital (tombol manual)"
+    ]
+  }
+  ]
+  </content>
+<parameter name="filePath">d:\Perkuliahan S6\Web Framework\smartroom\scenarios.json

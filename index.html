@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulator Smart Room - Tahap 2</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser-arcade-physics.min.js"></script>
+    <!-- Blockly library -->
+    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+    <!-- Blockly JavaScript generator -->
+    <script src="https://unpkg.com/blockly/javascript_compressed.js"></script>
+    <style>
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #2c3e50; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; }
+        #game-container { position: relative; width: 800px; height: 600px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        #codeModal { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 10; }
+        #codeModal h3 { margin-top: 0; color: #2c3e50; }
+        .btn { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-submit { background-color: #27ae60; color: white; }
+        .btn-close { background-color: #e74c3c; color: white; margin-left: 10px; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="codeModal">
+        <h3 id="modalTitle">Modul Kontrol ESP32</h3>
+        <p id="modalDescription" style="font-size: 14px; color: #7f8c8d;">Perbaiki kode di bawah ini:</p>
+        <p id="resultText" style="font-size: 14px; font-weight:bold; margin-top:5px;"></p>
+        <div id="blocklyDiv" style="height: 220px; width: 100%; background: #f5f5f5; border: 1px solid #ddd;"></div>
+        <xml id="toolbox" style="display: none;"></xml>
+        <div style="margin-top:10px;">
+            <button class="btn btn-submit" onclick="submitCode()">Kirim Kode</button>
+            <button class="btn btn-close" onclick="closeModal()">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// === DAFTARKAN BLOK KUSTOM SAAT HALAMAN SIAP ===
+(function() {
+    // Tunggu sampai Blockly dan Generator JavaScript siap
+    function waitForBlockly(callback) {
+        if (typeof Blockly === 'undefined' || typeof Blockly.Blocks === 'undefined' || typeof javascript === 'undefined') {
+            setTimeout(function() { waitForBlockly(callback); }, 50);
+            return;
+        }
+        callback();
+    }
+    
+    waitForBlockly(function() {
+        console.log('Mendaftarkan blok kustom (Versi Blockly Terbaru)...');
+        
+        // Simpan generator versi terbaru ke dalam variabel
+        const jsGen = javascript.javascriptGenerator;
+        
+        // Blok: Kontrol Pin Digital
+        Blockly.Blocks['digital_write'] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField("🔌 Nyalakan/Matikan")
+                    .appendField(new Blockly.FieldDropdown([["Nyalakan (HIGH)", "HIGH"], ["Matikan (LOW)", "LOW"]]), "STATE");
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour(120);
+                this.setTooltip('Mengontrol perangkat (HIGH=nyala, LOW=mati)');
+            }
+        };
+
+        // PERBAIKAN: Menggunakan format .forBlock
+        jsGen.forBlock['digital_write'] = function(block, generator) {
+            var state = block.getFieldValue('STATE');
+            return 'digitalWrite(' + state + ');\n';
+        };
+
+        // Blok: Baca Sensor Suhu
+        Blockly.Blocks['sensor_suhu'] = {
+            init: function() {
+                this.appendDummyInput().appendField("🌡️ Suhu Ruangan");
+                this.setOutput(true, null);
+                this.setColour(210);
+                this.setTooltip('Membaca suhu ruangan (°C)');
+            }
+        };
+
+        jsGen.forBlock['sensor_suhu'] = function(block, generator) {
+            return ['sensorSuhu()', jsGen.ORDER_FUNCTION_CALL];
+        };
+
+        // Blok: Deteksi Gerakan
+        Blockly.Blocks['sensor_gerakan'] = {
+            init: function() {
+                this.appendDummyInput().appendField("👁️ Ada Gerakan?");
+                this.setOutput(true, null);
+                this.setColour(210);
+                this.setTooltip('Mendeteksi gerakan (true/false)');
+            }
+        };
+
+        jsGen.forBlock['sensor_gerakan'] = function(block, generator) {
+            return ['adaGerakan()', jsGen.ORDER_FUNCTION_CALL];
+        };
+
+        // Blok: Baca Sensor Cahaya
+        Blockly.Blocks['sensor_cahaya'] = {
+            init: function() {
+                this.appendDummyInput().appendField("☀️ Cahaya (Lux)");
+                this.setOutput(true, null);
+                this.setColour(210);
+                this.setTooltip('Membaca tingkat cahaya (lux)');
+            }
+        };
+
+        jsGen.forBlock['sensor_cahaya'] = function(block, generator) {
+            return ['sensorCahaya()', jsGen.ORDER_FUNCTION_CALL];
+        };
+
+        // Blok: Waktu
+        Blockly.Blocks['waktu_sekarang'] = {
+            init: function() {
+                this.appendDummyInput().appendField("⏰ Jam Sekarang");
+                this.setOutput(true, 'Number');
+                this.setColour(65);
+            }
+        };
+
+        jsGen.forBlock['waktu_sekarang'] = function(block, generator) {
+            return ['jamSekarang()', jsGen.ORDER_FUNCTION_CALL];
+        };
+
+        console.log('Blok kustom berhasil didaftarkan!');
+        window.customBlocksReady = true;
+    });
+})();
+
+// Konfigurasi Phaser
+const config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    parent: 'game-container', 
+    physics: { default: 'arcade', arcade: { debug: false } },
+    scene: { preload: preload, create: create, update: update }
+};
+
+const game = new Phaser.Game(config);
+
+let player, boardgame, kipas, currentInteractiveObject;
+let cursors, wasd, spaceKey, actionText;
+let isModalOpen = false, lastDirection = 'down', workspace;
+let debugMode = false; // Mode debug untuk melihat collision bounds
+
+// Skenario soal
+const scenarios = {
+    boardgame: {
+        nama_perangkat: "Board Game Otomatis",
+        deskripsi_masalah: "Board Game harus menyala jika ada gerakan DAN cahaya < 50 lux",
+        kebutuhan_blok: ['sensor_gerakan', 'sensor_cahaya', 'digital_write']
+    },
+    kipas: {
+        nama_perangkat: "Kipas Angin Pintar",
+        deskripsi_masalah: "Kipas harus menyala jika suhu > 25°C",
+        kebutuhan_blok: ['sensor_suhu', 'digital_write']
+    }
+};
+
+function preload() {
+    this.load.image('depan', 'backend/frontend/public/asset/depan.png');
+    this.load.image('belakang', 'backend/frontend/public/asset/belakang.png');
+    this.load.image('jalanatas', 'backend/frontend/public/asset/jalanatas.png');
+    this.load.image('jalanbawah', 'backend/frontend/public/asset/jalanbawah.png');
+    this.load.image('jalankanan', 'backend/frontend/public/asset/jalankanan.png');
+    this.load.image('jalankiri', 'backend/frontend/public/asset/jalankiri.png');
+    this.load.image('kanan', 'backend/frontend/public/asset/kanan.png');
+    this.load.image('kiri', 'backend/frontend/public/asset/kiri.png');
+    this.load.image('kipas', 'backend/frontend/public/asset/kipas.png');
+    this.load.image('kipashidup', 'backend/frontend/public/asset/kipashidup.png');
+    this.load.image('boardgame', 'backend/frontend/public/asset/boardgame.png');
+    this.load.image('boardgamehidup', 'backend/frontend/public/asset/boardgamehidup.png');
+    this.load.image('bg_kamar', 'backend/frontend/public/asset/bg_kamar.png'); // Ganti path/to dengan lokasi file Anda
+}
+
+function create() {
+    this.cameras.main.setBackgroundColor('#ecf0f1');
+    this.add.image(400, 300, 'bg_kamar').setDisplaySize(800, 600);
+    player = this.physics.add.sprite(120, 550, 'depan');
+    player.setCollideWorldBounds(true);
+    player.setScale(0.45);
+
+    // --- PERBAIKAN PENTING: Mengecilkan hitbox karakter hanya di bagian kaki ---
+    // Titik pusat tabrakan digeser dan dikecilkan agar pergerakan lebih realistis
+    player.setBodySize(40, 30); 
+    player.setOffset(12, 34);
+
+    this.anims.create({ key: 'walk_up', frames: [{ key: 'jalanatas' }, { key: 'belakang' }], frameRate: 8, repeat: -1 });
+    this.anims.create({ key: 'walk_down', frames: [{ key: 'jalanbawah' }, { key: 'depan' }], frameRate: 8, repeat: -1 });
+    this.anims.create({ key: 'walk_left', frames: [{ key: 'jalankiri' }, { key: 'kiri' }, { key: 'jalankiri' }, { key: 'kiri' }], frameRate: 12, repeat: -1 });
+    this.anims.create({ key: 'walk_right', frames: [{ key: 'jalankanan' }, { key: 'kanan' }, { key: 'jalankanan' }, { key: 'kanan' }], frameRate: 12, repeat: -1 });
+    
+    boardgame = this.physics.add.sprite(600, 150, 'boardgame');
+    boardgame.setImmovable(true);
+    boardgame.setDisplaySize(60, 70);
+    boardgame.setBodySize(60, 70);
+    boardgame.type = 'boardgame';
+
+    kipas = this.physics.add.sprite(340, 135, 'kipas');
+    kipas.setImmovable(true);
+    kipas.setDisplaySize(60, 70);
+    kipas.setBodySize(60, 70);
+    kipas.type = 'kipas';
+
+    this.physics.add.collider(player, boardgame);
+    this.physics.add.collider(player, kipas);
+
+    // Buat grup untuk furniture/obstacle
+    const obstacles = this.physics.add.staticGroup();
+
+    // Data posisi furniture dan tembok (sesuai garis kuning di gambar)
+    const furnitureData = [
+    // === TEMBOK KIRI (TIPIS SAJA) ===
+    { x: 0, y: 0, width: 20, height: 600 },
+
+    // === KASUR (HANYA BAGIAN ATAS) ===
+    { x: 20, y: 120, width: 260, height: 120 },
+
+    // === NAKAS + KIPAS ===
+    { x: 280, y: 80, width: 120, height: 100 },
+
+    // === ATAS TENGAH (BAWAH JENDELA) ===
+    { x: 400, y: 0, width: 200, height: 100 },
+
+    // === AREA KOMPUTER ===
+    { x: 600, y: 100, width: 120, height: 100 },
+
+    // === LEMARI ===
+    { x: 720, y: 0, width: 80, height: 200 },
+
+    // === SISI KANAN TURUN ===
+    { x: 760, y: 200, width: 40, height: 200 },
+
+    // === MEJA KANAN ===
+    { x: 650, y: 400, width: 150, height: 150 },
+
+    // === TEMBOK BAWAH (FULL TANPA CELAH) ===
+    { x: 0, y: 560, width: 800, height: 40 },
+];
+
+    // Buat kotak tabrakan
+   furnitureData.forEach((data) => {
+    const obstacle = obstacles.create(data.x, data.y);
+
+    obstacle.setOrigin(0, 0); // pakai top-left biar presisi
+    obstacle.setDisplaySize(data.width, data.height);
+
+    obstacle.body.setSize(data.width, data.height);
+    obstacle.body.updateFromGameObject();
+
+    obstacle.setVisible(false);
+});
+
+    this.obstacles = obstacles;
+    this.furnitureData = furnitureData;
+    this.graphics = this.add.graphics();
+
+    this.physics.add.collider(player, obstacles);
+    this.physics.add.collider(player, boardgame);
+    this.physics.add.collider(player, kipas);
+
+    actionText = this.add.text(550, 240, 'Tekan SPASI', { fontSize: '14px', fill: '#c0392b', fontWeight: 'bold' });
+    actionText.setVisible(false);
+    
+    cursors = this.input.keyboard.createCursorKeys();
+    wasd = this.input.keyboard.addKeys({ up: Phaser.Input.Keyboard.KeyCodes.W, down: Phaser.Input.Keyboard.KeyCodes.S, left: Phaser.Input.Keyboard.KeyCodes.A, right: Phaser.Input.Keyboard.KeyCodes.D });
+    spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    const dKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+
+    this.add.text(20, 20, 'Gunakan W,A,S,D. Dekati perangkat & tekan SPASI', { fontSize: '16px', fill: '#2c3e50', backgroundColor: 'rgba(255,255,255,0.7)' });
+    
+    // Tombol D untuk menampilkan garis merah pelindung
+    dKey.on('down', function() {
+        debugMode = !debugMode;
+        if (debugMode) {
+            console.log('✓ Debug mode ON');
+        } else {
+            console.log('✗ Debug mode OFF');
+        }
+    });
+}
+
+function update() {
+    if (isModalOpen) { player.setVelocity(0); return; }
+    const speed = 150;
+    player.setVelocity(0);
+
+    if (cursors.up.isDown || wasd.up.isDown) { player.setVelocityY(-speed); player.anims.play('walk_up', true); lastDirection = 'up'; }
+    else if (cursors.down.isDown || wasd.down.isDown) { player.setVelocityY(speed); player.anims.play('walk_down', true); lastDirection = 'down'; }
+    else if (cursors.left.isDown || wasd.left.isDown) { player.setVelocityX(-speed); player.anims.play('walk_left', true); lastDirection = 'left'; }
+    else if (cursors.right.isDown || wasd.right.isDown) { player.setVelocityX(speed); player.anims.play('walk_right', true); lastDirection = 'right'; }
+    else { player.anims.stop(); if (lastDirection === 'up') player.setTexture('belakang'); else if (lastDirection === 'down') player.setTexture('depan'); else if (lastDirection === 'left') player.setTexture('kiri'); else if (lastDirection === 'right') player.setTexture('kanan'); }
+
+    const distBoardgame = Phaser.Math.Distance.Between(player.x, player.y, boardgame.x, boardgame.y);
+    const distKipas = Phaser.Math.Distance.Between(player.x, player.y, kipas.x, kipas.y);
+
+    if (distBoardgame < 80) {
+        actionText.setVisible(true); actionText.setPosition(boardgame.x - 50, boardgame.y - 50); actionText.setText('Tekan SPASI');
+        currentInteractiveObject = boardgame;
+        if (Phaser.Input.Keyboard.JustDown(spaceKey)) openModal('boardgame');
+    } else if (distKipas < 80) {
+        actionText.setVisible(true); actionText.setPosition(kipas.x - 50, kipas.y - 50); actionText.setText('Tekan SPASI');
+        currentInteractiveObject = kipas;
+        if (Phaser.Input.Keyboard.JustDown(spaceKey)) openModal('kipas');
+    } else { actionText.setVisible(false); currentInteractiveObject = null; }
+    
+    // Debug drawing untuk collision bounds
+    if (debugMode && this.graphics && this.furnitureData) {
+        this.graphics.clear();
+        this.graphics.lineStyle(2, 0xff0000, 1);
+        this.furnitureData.forEach(function(data) {
+            const x = data.x - data.width / 2;
+            const y = data.y - data.height / 2;
+            this.graphics.strokeRect(x, y, data.width, data.height);
+        }, this);
+        
+        // Gambar collision circle player
+        this.graphics.lineStyle(2, 0x00ff00, 1);
+        this.graphics.strokeCircle(player.x, player.y, 15);
+    } else if (this.graphics) {
+        this.graphics.clear();
+    }
+}
+
+function openModal(deviceType) {
+    isModalOpen = true;
+    document.getElementById('codeModal').style.display = 'block';
+    document.getElementById('codeModal').dataset.device = deviceType;
+
+    const scen = scenarios[deviceType];
+    document.getElementById('modalTitle').textContent = scen.nama_perangkat;
+    document.getElementById('modalDescription').textContent = scen.deskripsi_masalah;
+
+    const toolboxXml = buildToolbox(scen.kebutuhan_blok, deviceType);
+    document.getElementById('toolbox').innerHTML = toolboxXml;
+
+    // Tunggu sebentar agar blok kustom siap
+    setTimeout(function() {
+        if (!workspace) {
+            workspace = Blockly.inject('blocklyDiv', { toolbox: toolboxXml });
+        } else {
+            workspace.updateToolbox(toolboxXml);
+            workspace.clear();
+        }
+    }, 200);
+
+    game.input.keyboard.enabled = false;
+}
+
+function buildToolbox(neededBlocks, deviceType) {
+    const blockMap = {
+        'digital_write': '<block type="digital_write"></block>',
+        'sensor_suhu': '<block type="sensor_suhu"></block>',
+        'sensor_gerakan': '<block type="sensor_gerakan"></block>',
+        'sensor_cahaya': '<block type="sensor_cahaya"></block>',
+        'waktu_sekarang': '<block type="waktu_sekarang"></block>'
+    };
+
+    let xml = '<xml>';
+    
+    // Kategori: Perangkat
+    xml += '<category name="📟 Perangkat" colour="120">';
+    if (neededBlocks.includes('digital_write')) xml += blockMap['digital_write'];
+    xml += '</category>';
+    
+    // Kategori: Sensor
+    xml += '<category name="🔬 Sensor" colour="210">';
+    neededBlocks.forEach(function(b) { if (blockMap[b] && b !== 'digital_write') xml += blockMap[b]; });
+    xml += '</category>';
+    
+    // Kategori: Logika Dasar
+    xml += '<category name="🔀 Logika" colour="210">';
+    xml += '<block type="controls_if"></block>';
+    xml += '<block type="logic_compare"></block>';
+    xml += '<block type="logic_operation"><field name="OP">AND</field></block>';
+    xml += '<block type="logic_negate"></block>';
+    xml += '<block type="logic_boolean"></block>';
+    xml += '</category>';
+    
+    // Kategori: Matematika
+    xml += '<category name="🔢 Angka" colour="230">';
+    xml += '<block type="math_number"><field name="NUM">25</field></block>';
+    xml += '<block type="math_number"><field name="NUM">50</field></block>';
+    xml += '<block type="math_number"><field name="NUM">0</field></block>';
+    xml += '</category>';
+    
+    // Kategori: Perulangan
+    xml += '<category name="🔄 Looping" colour="120">';
+    xml += '<block type="controls_repeat_ext"><value name="TIMES"><shadow type="math_number"><field name="NUM">10</field></shadow></value></block>';
+    xml += '</category>';
+    
+    xml += '</xml>';
+    return xml;
+}
+
+function closeModal() {
+    isModalOpen = false;
+    document.getElementById('codeModal').style.display = 'none';
+    game.input.keyboard.enabled = true;
+}
+
+function submitCode() {
+    console.log("Mengirim kode...");
+    let kodeSiswa = '';
+    try {
+        if (workspace && window.customBlocksReady) {
+            kodeSiswa = javascript.javascriptGenerator.workspaceToCode(workspace);
+            console.log("Kode:", kodeSiswa);
+        } else {
+            alert("Blok belum siap. Silakan tunggu sebentar dan coba lagi.");
+            return;
+        }
+    } catch (e) {
+        alert("Error: " + e.message);
+        return;
+    }
+    
+    if (kodeSiswa.trim() === "") {
+        alert("Silakan susun blok terlebih dahulu!");
+        return;
+    }
+
+    const resultEl = document.getElementById('resultText');
+    resultEl.textContent = 'Mengirim...';
+    resultEl.style.color = '#7f8c8d';
+
+    fetch('http://localhost:8000/api/score/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: kodeSiswa })
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data.correct === true) {
+            resultEl.textContent = '✓ Jawaban Benar!';
+            resultEl.style.color = 'green';
+            var deviceType = document.getElementById('codeModal').dataset.device;
+            if (deviceType === 'boardgame') boardgame.setTexture('boardgamehidup');
+            else if (deviceType === 'kipas') kipas.setTexture('kipashidup');
+        } else {
+            resultEl.textContent = '✗ Coba Lagi!';
+            resultEl.style.color = 'red';
+        }
+        setTimeout(function() { closeModal(); if (workspace) workspace.clear(); resultEl.textContent = ''; }, 2000);
+    })
+    .catch(function(error) {
+        resultEl.textContent = 'Server tidak aktif. Pastikan backend berjalan.';
+        resultEl.style.color = 'orange';
+        setTimeout(function() { closeModal(); resultEl.textContent = ''; }, 3000);
+    });
+}
+</script>
+</body>
+</html>
+
