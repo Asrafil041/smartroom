@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="160" viewBox="0 0 200 160">
+  <defs>
+    <linearGradient id="lightGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0891b2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="200" height="160" fill="url(#lightGradient)"/>
+  
+  <!-- Lightbulb -->
+  <g transform="translate(100, 50)">
+    <!-- Bulb -->
+    <circle cx="0" cy="0" r="20" fill="#fbbf24" stroke="#f59e0b" stroke-width="1"/>
+    
+    <!-- Glow -->
+    <circle cx="0" cy="0" r="25" fill="#fbbf24" opacity="0.2"/>
+    
+    <!-- Base -->
+    <rect x="-8" y="18" width="16" height="8" fill="#374151"/>
+    <rect x="-10" y="26" width="20" height="4" fill="#1f2937"/>
+  </g>
+  
+  <!-- Light rays -->
+  <g stroke="#fbbf24" stroke-width="2" opacity="0.6">
+    <line x1="100" y1="10" x2="100" y2="0"/>
+    <line x1="130" y1="30" x2="138" y2="22"/>
+    <line x1="140" y1="60" x2="150" y2="60"/>
+    <line x1="70" y1="30" x2="62" y2="22"/>
+    <line x1="60" y1="60" x2="50" y2="60"/>
+  </g>
+  
+  <!-- Sensor indicator -->
+  <circle cx="100" cy="120" r="15" fill="#fff" opacity="0.2" stroke="#fff" stroke-width="1"/>
+  <circle cx="100" cy="120" r="10" fill="none" stroke="#fff" stroke-width="1"/>
+  <circle cx="100" cy="120" r="5" fill="#10b981"/>
+</svg>

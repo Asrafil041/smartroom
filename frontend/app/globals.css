@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+:root {
+  --background: #1b1038;
+  --foreground: #f2e7ff;
+  --retro-bg: #2c1556;
+  --retro-panel: #3d2d4d;
+  --retro-panel-2: #2d1a5f;
+  --retro-accent: #8a5fb5;
+  --retro-accent-2: #c8a8d8;
+  --retro-border: #5f3d7a;
+  --retro-shadow: #12091f;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Courier New', Courier, monospace;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 22px, rgba(255, 255, 255, 0.035) 22px, rgba(255, 255, 255, 0.035) 44px),
+    repeating-linear-gradient(90deg, transparent, transparent 22px, rgba(255, 255, 255, 0.035) 22px, rgba(255, 255, 255, 0.035) 44px),
+    radial-gradient(circle at top, rgba(138, 95, 181, 0.28), transparent 36%),
+    linear-gradient(135deg, #1b1038 0%, #2c1556 48%, #1a0f3f 100%);
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,0.05), transparent 12%, transparent 88%, rgba(0,0,0,0.2));
+  mix-blend-mode: screen;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(138, 95, 181, 0.5);
+  color: #fff;
+}

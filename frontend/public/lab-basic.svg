@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="160" viewBox="0 0 200 160">
+  <defs>
+    <linearGradient id="labBasicGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="200" height="160" fill="url(#labBasicGrad)"/>
+  
+  <!-- Microcontroller Board -->
+  <rect x="40" y="50" width="120" height="60" fill="#1e293b" stroke="#fff" stroke-width="2" rx="4"/>
+  
+  <!-- Components on board -->
+  <circle cx="60" cy="65" r="6" fill="#fbbf24"/>
+  <rect x="75" y="60" width="8" height="16" fill="#ef4444"/>
+  <circle cx="95" cy="70" r="5" fill="#10b981"/>
+  <rect x="110" y="65" width="6" height="18" fill="#6366f1"/>
+  <circle cx="130" cy="68" r="4" fill="#ec4899"/>
+  
+  <!-- Connections -->
+  <line x1="55" y1="110" x2="75" y2="120" stroke="#fff" stroke-width="1" opacity="0.6"/>
+  <line x1="100" y1="110" x2="100" y2="125" stroke="#fff" stroke-width="1" opacity="0.6"/>
+  <line x1="145" y1="110" x2="125" y2="120" stroke="#fff" stroke-width="1" opacity="0.6"/>
+  
+  <!-- Code symbol -->
+  <text x="100" y="140" font-size="20" fill="#fff" text-anchor="middle" font-weight="bold">{">"}</text>
+</svg>

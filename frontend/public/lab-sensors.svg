@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="160" viewBox="0 0 200 160">
+  <defs>
+    <linearGradient id="labSensorsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0369a1;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="200" height="160" fill="url(#labSensorsGrad)"/>
+  
+  <!-- Sensor devices -->
+  <!-- Temperature Sensor -->
+  <circle cx="50" cy="60" r="12" fill="#fbbf24" stroke="#fff" stroke-width="2"/>
+  <text x="50" y="65" font-size="14" fill="#1e293b" text-anchor="middle" font-weight="bold">°C</text>
+  
+  <!-- Humidity Sensor -->
+  <circle cx="100" cy="50" r="12" fill="#10b981" stroke="#fff" stroke-width="2"/>
+  <text x="100" y="56" font-size="16" fill="#fff" text-anchor="middle" font-weight="bold">💧</text>
+  
+  <!-- Pressure Sensor -->
+  <circle cx="150" cy="60" r="12" fill="#ef4444" stroke="#fff" stroke-width="2"/>
+  <text x="150" y="66" font-size="14" fill="#fff" text-anchor="middle" font-weight="bold">P</text>
+  
+  <!-- Display/LCD -->
+  <rect x="30" y="90" width="140" height="40" fill="#1e293b" stroke="#fff" stroke-width="2" rx="4"/>
+  <rect x="40" y="100" width="120" height="20" fill="#10b981" opacity="0.2"/>
+  
+  <!-- Points on display -->
+  <circle cx="50" cy="110" r="2" fill="#10b981"/>
+  <circle cx="65" cy="110" r="2" fill="#10b981"/>
+  <circle cx="80" cy="110" r="2" fill="#10b981"/>
+  <circle cx="95" cy="110" r="2" fill="#10b981"/>
+  <circle cx="110" cy="110" r="2" fill="#10b981"/>
+  <circle cx="125" cy="110" r="2" fill="#10b981"/>
+  <circle cx="140" cy="110" r="2" fill="#10b981"/>
+  
+  <!-- Connection lines -->
+  <line x1="50" y1="72" x2="50" y2="90" stroke="#fff" stroke-width="1" opacity="0.6"/>
+  <line x1="100" y1="62" x2="100" y2="90" stroke="#fff" stroke-width="1" opacity="0.6"/>
+  <line x1="150" y1="72" x2="150" y2="90" stroke="#fff" stroke-width="1" opacity="0.6"/>
+</svg>
