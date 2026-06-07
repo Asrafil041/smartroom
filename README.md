@@ -89,7 +89,7 @@ Buka browser dan akses:
 ### 4. Link Deployment
 
 Buka browser dan akses:
-- `https://zip-repl--2313025041.replit.app`
+- `https://zip-repl--2313025041.replit.app` berlaku 1 bulan
 
 ## Catatan Tambahan
 
