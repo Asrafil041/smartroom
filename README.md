@@ -86,6 +86,11 @@ Frontend akan berjalan di `http://localhost:3000` secara default.
 Buka browser dan akses:
 - `http://localhost:3000` untuk UI aplikasi
 
+### 4. Link Deployment
+
+Buka browser dan akses:
+- `https://zip-repl--2313025041.replit.app`
+
 ## Catatan Tambahan
 
 - Jika backend dijalankan di alamat atau port berbeda, periksa konfigurasi `NEXT_PUBLIC_API_URL` di file frontend.
