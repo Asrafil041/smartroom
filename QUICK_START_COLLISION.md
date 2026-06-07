@@ -8,7 +8,7 @@
 
 ### 1. Test Game
 ```
-Buka index.html di browser
+Buka `/simulation/kipas` (atau `/simulation/boardgame`, `/simulation/demo`) di browser
 ↓
 Coba berjalan ke furniture (kasur, lemari, meja)
 ↓
@@ -23,7 +23,7 @@ Player akan berhenti (collision detection bekerja!)
 - **Garis HIJAU** = player collision radius
 
 **Sesuaikan Posisi:**
-- Edit `index.html`
+- Edit `backend/frontend/app/simulation/[roomId]/page.tsx`
 - Cari section `const furnitureData = [`
 - Ubah parameter `x`, `y`, `width`, `height`
 - Refresh browser
@@ -51,7 +51,7 @@ Jika kasur collision box posisinya salah:
 
 ## File Penting
 
-- `index.html` → File game utama (edit `furnitureData` untuk adjust position)
+- `backend/frontend/app/simulation/[roomId]/page.tsx` → Source game utama (edit `furnitureData` untuk adjust position)
 - `COLLISION_DEBUG_GUIDE.md` → Dokumentasi lengkap
 - Debug Mode → Tekan D untuk toggle visualisasi
 
@@ -66,3 +66,4 @@ Jika kasur collision box posisinya salah:
 
 ---
 **Need help?** Lihat `COLLISION_DEBUG_GUIDE.md` untuk panduan lengkap
+

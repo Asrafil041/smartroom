@@ -31,7 +31,7 @@ Ketika Anda mencoba bergerak ke furniture merah, player (hijau) akan terhenti da
 
 ## Menyesuaikan Posisi Collision Boxes
 
-Jika furniture tidak sejajar dengan collision boxes, edit file `index.html` dan cari bagian ini:
+Jika furniture tidak sejajar dengan collision boxes, edit file `backend/frontend/app/simulation/[roomId]/page.tsx` dan cari bagian ini:
 
 ```javascript
 const furnitureData = [
@@ -123,7 +123,7 @@ Setelah edit, test dengan:
    ↓
 3. Lihat lokasi furniture vs collision box
    ↓
-4. Jika tidak sejajar → Edit index.html (furnitureData)
+4. Jika tidak sejajar → Edit `backend/frontend/app/simulation/[roomId]/page.tsx` (furnitureData)
    ↓
 5. Refresh browser → Lihat perubahan
    ↓
@@ -164,3 +164,4 @@ Dengan 9 furniture, performa tetap smooth (~60 FPS).
 ---
 
 **Dibuat dengan** ❤️ **untuk Smart Room Learning Game**
+

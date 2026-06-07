@@ -16,8 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('gameapi.urls')),
+    # Redirect root to the Next.js frontend (developer server)
+    path('', RedirectView.as_view(url='http://localhost:3000/')),
 ]
